@@ -1,3 +1,6 @@
+*.idea
+javalin-testing-example.iml
+
 target/
 pom.xml.tag
 pom.xml.releaseBackup
