@@ -1,23 +1,19 @@
 package io.javalin.example.kotlin
 
-import io.javalin.plugin.json.JavalinJson
-import kong.unirest.HttpResponse
-import kong.unirest.Unirest
+import io.javalin.plugin.json.JavalinJackson
+import io.javalin.testtools.TestUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
 class FunctionalTest {
 
-    private val app = JavalinApp() // inject any dependencies you might have
-    private val usersJson = JavalinJson.toJson(UserController.users)
+    private val app = Application("someDependency").app // inject any dependencies you might have
+    private val usersJson = JavalinJackson().toJsonString(UserController.users)
 
     @Test
-    fun `GET to fetch users returns list of users`() {
-        app.start(1234)
-        val response: HttpResponse<String> = Unirest.get("http://localhost:1234/users").asString()
-        assertThat(response.status).isEqualTo(200)
-        assertThat(response.body).isEqualTo(usersJson)
-        app.stop()
+    fun `GET to fetch users returns list of users`() = TestUtil.test(app) { server, client ->
+        assertThat(client.get("/users").code).isEqualTo(200)
+        assertThat(client.get("/users").body?.string()).isEqualTo(usersJson)
     }
 
 }
